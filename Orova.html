@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Orova — Your Day, Without the Mess</title>
+<style>
+:root{--bg:#f6f4ef;--ink:#18211c;--muted:#68736c;--card:#fff;--line:#e4e5df;--green:#2d6a4f;--soft:#e6f0ea;--yellow:#f5e8b8}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
+.app{max-width:720px;margin:auto;padding:24px 18px 50px}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.brand{font-size:30px;font-weight:900;letter-spacing:4px}.date{font-size:13px;color:var(--muted);margin-top:3px}
+.progress{width:54px;height:54px;border-radius:50%;background:var(--soft);display:flex;flex-direction:column;align-items:center;justify-content:center}.progress b{color:var(--green);font-size:15px}.progress small{color:var(--muted);font-size:9px}
+.card{background:var(--card);border-radius:20px;padding:18px;margin:14px 0;box-shadow:0 5px 20px #00000009}
+.next{background:var(--green);color:white;padding:21px;border-radius:22px}.eyebrow{font-size:11px;letter-spacing:1.5px;font-weight:900;color:#cfe4d7}.next h1{font-size:26px;margin:7px 0 3px}.next p{margin:0;color:#dcebe2}
+button{font:inherit;cursor:pointer}.start{margin-top:15px;border:0;border-radius:12px;padding:11px 15px;font-weight:800;color:var(--green);background:#fff}
+.row{display:flex;justify-content:space-between;align-items:center;gap:15px}.section-title{font-size:17px;font-weight:900}.muted{font-size:12px;color:var(--muted);margin-top:3px}
+.energy{display:flex;gap:4px}.energy button{border:0;background:transparent;font-size:23px;color:#9aa39d;padding:2px}.energy .on{color:var(--green)}
+.section-head{display:flex;justify-content:space-between;align-items:center;margin:24px 2px 8px}.link{color:var(--green);font-size:12px;font-weight:800;border:0;background:transparent}
+.task{display:flex;align-items:center;gap:12px;padding:13px 4px;border-bottom:1px solid var(--line);cursor:pointer}.dot{width:23px;height:23px;border:1.5px solid #83a991;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;flex:none}.doneDot{background:var(--green);border-color:var(--green)}.taskTitle{font-weight:700;font-size:15px}.done{text-decoration:line-through;color:#89928c}.taskMeta{font-size:11px;color:var(--muted);margin-top:3px}.show{display:block;text-align:center;padding:13px;color:var(--green);font-weight:800;font-size:13px;cursor:pointer}
+.chat-head{display:flex;align-items:center;gap:8px}.ai{background:var(--soft);color:var(--green);padding:4px 7px;border-radius:7px;font-size:10px;font-weight:900}.bubble{max-width:88%;padding:11px;border-radius:14px;margin:8px 0;font-size:13px;line-height:18px}.bot{background:#f0f2ee}.me{background:var(--green);color:white;margin-left:auto}.inputrow{display:flex;gap:8px;margin-top:10px}.input{flex:1;border:1px solid var(--line);border-radius:13px;padding:12px;font-size:14px;outline:none}.send{width:46px;border:0;border-radius:13px;background:var(--green);color:#fff;font-size:20px;font-weight:900}.quick{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}.quick button{border:0;background:var(--soft);color:var(--green);padding:8px 10px;border-radius:9px;font-size:11px;font-weight:800}
+.idea{background:var(--yellow);border-radius:18px;padding:16px;margin-top:14px}.idea b{display:block;margin-bottom:4px}.footer{text-align:center;color:#8b948e;font-size:10px;margin-top:20px}
+@media(max-width:500px){.app{padding:20px 14px}.brand{font-size:27px}.energy button{font-size:20px}}
+</style>
+<style>
+.onboarding{position:fixed;inset:0;background:#f6f4ef;z-index:100;display:flex;align-items:center;justify-content:center;padding:22px}
+.onboard-card{width:min(520px,100%);min-height:650px;background:#fff;border-radius:30px;padding:34px 28px;display:flex;flex-direction:column;justify-content:center;box-shadow:0 20px 60px #00000012}
+.onboard-logo{position:absolute;top:30px;font-weight:900;letter-spacing:5px;color:#2d6a4f}
+.ob-screen{display:none;animation:fade .45s ease}.ob-screen.active{display:block}@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.ob-kicker{text-transform:uppercase;letter-spacing:1.5px;font-size:11px;font-weight:900;color:#2d6a4f;margin-bottom:12px}
+.ob-screen h1{font-family:Georgia,serif;font-size:42px;line-height:1.05;margin:0 0 13px;color:#18211c}.ob-screen p{font-size:17px;line-height:1.55;color:#68736c;margin-bottom:30px}.soft{font-size:15px!important}
+.login,.continue{width:100%;border:0;border-radius:15px;padding:15px;margin-top:10px;font-weight:800;font-size:15px;cursor:pointer}.apple{background:#18211c;color:white}.email{background:#e6f0ea;color:#2d6a4f}.ob-screen small{display:block;text-align:center;color:#9aa39d;font-size:10px;margin-top:18px}
+.mood-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin:20px 0}.mood-grid button{border:1px solid #e4e5df;background:#fafaf8;border-radius:15px;padding:13px 3px;font-size:25px;cursor:pointer}.mood-grid span{display:block;font-size:10px;color:#68736c;margin-top:6px}.mood-grid .selected{background:#e6f0ea;border-color:#2d6a4f}
+.continue{background:#2d6a4f;color:#fff}.ob-screen textarea{width:100%;height:130px;border:1px solid #e4e5df;border-radius:16px;padding:15px;font:15px inherit;resize:none;outline:none;background:#fafaf8}
+.menu-btn{border:0;background:transparent;font-size:22px;cursor:pointer;color:#18211c}.menu{display:none;background:#fff;border-radius:18px;padding:10px;margin:-8px 0 15px;box-shadow:0 8px 25px #0000000c}.menu.show{display:block}.menu-title{font-weight:900;padding:9px 10px}.menu button{display:block;width:100%;text-align:left;border:0;background:transparent;padding:12px;border-radius:10px;cursor:pointer}.menu button:hover{background:#f0f2ee}
+.week-card{background:#fff;border-radius:20px;padding:18px;margin-top:15px}.week-row{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid #e4e5df}.week-row:last-child{border-bottom:0}.week-row b{font-size:14px}.week-row span{font-size:12px;color:#68736c}
+@media(max-width:500px){.onboard-card{min-height:600px;padding:28px 21px}.ob-screen h1{font-size:36px}.mood-grid{gap:4px}}
+</style>
+</head>
+<body>
+<div id="onboarding" class="onboarding">
+  <div class="onboard-card">
+    <div class="onboard-logo">OROVA</div>
+    <div id="ob1" class="ob-screen active">
+      <div class="ob-kicker">A calmer way to organize life</div>
+      <h1>Welcome to Orova.</h1>
+      <p>Plan your day without making your life feel like a checklist.</p>
+      <button class="login apple" onclick="nextOb()"> &nbsp; Continue with Apple</button>
+      <button class="login email" onclick="nextOb()">✉ &nbsp; Continue with Email</button>
+      <small>By continuing, you agree to Orova's terms.</small>
+    </div>
+    <div id="ob2" class="ob-screen">
+      <div class="ob-kicker">Before we start</div>
+      <h1>How are you doing?</h1>
+      <p class="soft">No pressure. Just tell Orova how today feels.</p>
+      <div class="mood-grid">
+        <button onclick="setMood(this,'Great')">😊<span>Great</span></button>
+        <button onclick="setMood(this,'Good')">🙂<span>Good</span></button>
+        <button onclick="setMood(this,'Okay')">😐<span>Okay</span></button>
+        <button onclick="setMood(this,'Low')">😕<span>Low</span></button>
+        <button onclick="setMood(this,'Rough')">😔<span>Rough</span></button>
+      </div>
+      <button class="continue" onclick="nextOb()">Continue</button>
+    </div>
+    <div id="ob3" class="ob-screen">
+      <div class="ob-kicker">Let's make today feel easier</div>
+      <h1>What do you need to get done?</h1>
+      <p class="soft">Tell Orova everything. It doesn't have to be organized.</p>
+      <textarea id="firstPlan" placeholder="e.g. School until 3, football at 5, math homework, buy shampoo..."></textarea>
+      <button class="continue" onclick="finishOnboarding()">Plan my day →</button>
+    </div>
+  </div>
+</div>
+<div class="app">
+  <div class="top">
+    <button class="menu-btn" onclick="toggleMenu()">☰</button><div><div class="brand">OROVA</div><div class="date" id="date"></div></div>
+    <div class="progress"><b id="percent">0%</b><small>done</small></div>
+  </div>
+  <div id="menu" class="menu"><div class="menu-title">Your week</div>
+    <button onclick="showWeek()">📅 Plan the rest of my days</button>
+    <button onclick="alert('Profile settings coming next.')">⚙️ Profile & preferences</button>
+    <button onclick="alert('Notifications coming next.')">🔔 Notifications</button>
+  </div>
+
+  <div class="next">
+    <div class="eyebrow">UP NEXT</div>
+    <h1 id="nextTitle">Get ready + breakfast</h1>
+    <p id="nextMeta">7:30 · 45 min</p>
+    <button class="start" onclick="completeNext()">Start / complete</button>
+  </div>
+
+  <div class="card row">
+    <div><div class="section-title">How's your energy?</div><div class="muted">Orova uses this to choose harder tasks.</div></div>
+    <div class="energy" id="energy"></div>
+  </div>
+
+  <div class="section-head"><div class="section-title">Today</div><button class="link" onclick="rebuild()">Rebuild afternoon</button></div>
+  <div class="card" id="tasks"></div>
+  <div class="show" id="show" onclick="toggleAll()">Show full day</div>
+
+  <div class="card">
+    <div class="chat-head"><div class="section-title">Talk to Orova</div><div class="ai">AI</div></div>
+    <div id="chat">
+      <div class="bubble bot">Hey! I'm Orova. Dump everything that's on your mind — messy is fine. I'll turn it into a realistic day.</div>
+    </div>
+    <div class="inputrow">
+      <input id="input" class="input" placeholder="e.g. study science for 45 min" onkeydown="if(event.key==='Enter')send()">
+      <button class="send" onclick="send()">↑</button>
+    </div>
+    <div class="quick">
+      <button onclick="ask('Plan my day')">Plan my day</button>
+      <button onclick="ask('What should I do next?')">What next?</button>
+      <button onclick="rebuild()">Something changed</button>
+    </div>
+  </div>
+
+  <div class="idea"><b>Orova's idea: “Soft landing”</b><span class="muted">After a demanding task, Orova leaves a short buffer instead of stacking another task immediately. Real days have transitions.</span></div>
+  <div class="footer">Orova prototype · Your data stays in this browser</div>
+</div>
+
+<script>
+let tasks=[
+{id:1,title:"Get ready + breakfast",time:"7:30",mins:45,done:false,fixed:false},
+{id:2,title:"School / work",time:"8:15",mins:360,done:false,fixed:true},
+{id:3,title:"Lunch + reset",time:"14:15",mins:45,done:false,fixed:false},
+{id:4,title:"Math assignment",time:"15:15",mins:50,done:false,fixed:false},
+{id:5,title:"Football training",time:"17:00",mins:90,done:false,fixed:true},
+{id:6,title:"Dinner + shower",time:"19:00",mins:60,done:false,fixed:false},
+{id:7,title:"Pack bag + plan tomorrow",time:"20:15",mins:25,done:false,fixed:false}
+];
+let showAll=false, energy=3;
+
+function mins(t){let[a,b]=t.split(":").map(Number);return a*60+b}
+function fmt(n){return Math.floor(n/60)+":"+String(n%60).padStart(2,"0")}
+function render(){
+ document.getElementById("date").textContent=new Date().toLocaleDateString(undefined,{weekday:"long",month:"short",day:"numeric"})+" · Your day, without the mess.";
+ let done=tasks.filter(t=>t.done).length,p=Math.round(done/tasks.length*100);document.getElementById("percent").textContent=p+"%";
+ let next=tasks.find(t=>!t.done);
+ document.getElementById("nextTitle").textContent=next?next.title:"You're done for today 🎉";
+ document.getElementById("nextMeta").textContent=next?next.time+" · "+next.mins+" min":"Nice work.";
+ let list=showAll?tasks:tasks.slice(0,5);
+ document.getElementById("tasks").innerHTML=list.map(t=>`<div class="task" onclick="toggle(${t.id})"><div class="dot ${t.done?'doneDot':''}">${t.done?'✓':''}</div><div><div class="taskTitle ${t.done?'done':''}">${t.title}</div><div class="taskMeta">${t.time} · ${t.mins} min ${t.fixed?'· fixed':''}</div></div></div>`).join("");
+ document.getElementById("show").textContent=showAll?"Show less":"Show full day";
+}
+function toggle(id){tasks=tasks.map(t=>t.id===id?{...t,done:!t.done}:t);render()}
+function completeNext(){let n=tasks.find(t=>!t.done);if(n)toggle(n.id)}
+function toggleAll(){showAll=!showAll;render()}
+function rebuild(){
+ let cursor=15*60;
+ tasks=tasks.map(t=>{if(t.done||t.fixed)return t;let x={...t,time:fmt(cursor)};cursor+=t.mins+10;return x}).sort((a,b)=>mins(a.time)-mins(b.time));
+ addBot("Reality reset: I rebuilt the flexible parts of your afternoon with 10-minute buffers. Fixed commitments stayed where they were.");
+ render();
+}
+function addBubble(text,me=false){let d=document.createElement("div");d.className="bubble "+(me?"me":"bot");d.textContent=text;document.getElementById("chat").appendChild(d);d.scrollIntoView({behavior:"smooth"})}
+function addBot(t){addBubble(t,false)}
+function parseTask(text){
+ let low=text.toLowerCase(),duration=(low.match(/(\d+)\s*(?:min|minutes)/)||[])[1]||30;
+ let match=low.match(/\b([01]?\d|2[0-3])(?::([0-5]\d))?\s*(am|pm)?\b/),time="16:00";
+ if(match){let h=+match[1],m=+(match[2]||0),ap=match[3];if(ap==="pm"&&h<12)h+=12;if(ap==="am"&&h===12)h=0;time=fmt(h*60+m)}
+ return {id:Date.now(),title:text.trim(),time,mins:+duration,done:false,fixed:false}
+}
+function send(){
+ let el=document.getElementById("input"),text=el.value.trim();if(!text)return;
+ addBubble(text,true);el.value="";
+ let t=parseTask(text);tasks.push(t);tasks.sort((a,b)=>mins(a.time)-mins(b.time));render();
+ setTimeout(()=>addBot(`Added "${t.title}". I gave it a ${t.mins}-minute slot at ${t.time}. Tell me if your plans change and I'll reorganize the flexible tasks.`),250);
+}
+function ask(q){addBubble(q,true);setTimeout(()=>addBot(q==="Plan my day"?"Your fixed commitments stay protected. I'd put your hardest flexible task before training, then keep a short reset after dinner.":"Your next useful action is shown at the top. If something changes, tell me and I'll rebuild the remaining day."),250)}
+function toggleMenu(){document.getElementById("menu").classList.toggle("show")}
+function showWeek(){
+  toggleMenu();
+  let old=document.getElementById("weekCard"); if(old) old.remove();
+  let card=document.createElement("div"); card.id="weekCard"; card.className="week-card";
+  let days=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+  card.innerHTML='<div class="section-title">Plan the rest of your week</div><div class="muted">Tap a day to start planning it.</div>'+
+    days.map((d,i)=>`<div class="week-row" onclick="alert('Planning ${d} will open here.')"><b>${d}</b><span>${i===0?"Today":"Plan day →"}</span></div>`).join("");
+  document.querySelector(".app").appendChild(card);
+}
+let mood="";
+function nextOb(){
+  const screens=[document.getElementById("ob1"),document.getElementById("ob2"),document.getElementById("ob3")];
+  let i=screens.findIndex(x=>x.classList.contains("active"));
+  if(i<2){screens[i].classList.remove("active");screens[i+1].classList.add("active")}
+}
+function setMood(el,m){mood=m;document.querySelectorAll(".mood-grid button").forEach(x=>x.classList.remove("selected"));el.classList.add("selected")}
+function finishOnboarding(){
+  let text=document.getElementById("firstPlan").value.trim();
+  if(text){let t=parseTask(text);tasks.push(t);tasks.sort((a,b)=>mins(a.time)-mins(b.time))}
+  document.getElementById("onboarding").style.display="none";render();
+  if(mood)addBot("Thanks for checking in. You said you're feeling "+mood.toLowerCase()+". I'll keep today's plan realistic.");
+  if(text)addBot("I've added your first plan. Keep telling me things in the chat and I'll organize them.");
+}
+document.getElementById("energy").innerHTML=[1,2,3,4,5].map(n=>`<button class="${n===energy?'on':''}" onclick="setEnergy(${n})">${n===energy?'●':'○'}</button>`).join("");
+function setEnergy(n){energy=n;function toggleMenu(){document.getElementById("menu").classList.toggle("show")}
+function showWeek(){
+  toggleMenu();
+  let old=document.getElementById("weekCard"); if(old) old.remove();
+  let card=document.createElement("div"); card.id="weekCard"; card.className="week-card";
+  let days=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+  card.innerHTML='<div class="section-title">Plan the rest of your week</div><div class="muted">Tap a day to start planning it.</div>'+
+    days.map((d,i)=>`<div class="week-row" onclick="alert('Planning ${d} will open here.')"><b>${d}</b><span>${i===0?"Today":"Plan day →"}</span></div>`).join("");
+  document.querySelector(".app").appendChild(card);
+}
+let mood="";
+function nextOb(){
+  const screens=[document.getElementById("ob1"),document.getElementById("ob2"),document.getElementById("ob3")];
+  let i=screens.findIndex(x=>x.classList.contains("active"));
+  if(i<2){screens[i].classList.remove("active");screens[i+1].classList.add("active")}
+}
+function setMood(el,m){mood=m;document.querySelectorAll(".mood-grid button").forEach(x=>x.classList.remove("selected"));el.classList.add("selected")}
+function finishOnboarding(){
+  let text=document.getElementById("firstPlan").value.trim();
+  if(text){let t=parseTask(text);tasks.push(t);tasks.sort((a,b)=>mins(a.time)-mins(b.time))}
+  document.getElementById("onboarding").style.display="none";render();
+  if(mood)addBot("Thanks for checking in. You said you're feeling "+mood.toLowerCase()+". I'll keep today's plan realistic.");
+  if(text)addBot("I've added your first plan. Keep telling me things in the chat and I'll organize them.");
+}
+document.getElementById("energy").innerHTML=[1,2,3,4,5].map(x=>`<button class="${x===energy?'on':''}" onclick="setEnergy(${x})">${x===energy?'●':'○'}</button>`).join("");addBot(`Energy set to ${n}/5. I'll keep that in mind when suggesting what to tackle next.`)}
+render();
+</script>
+</body>
+</html>
