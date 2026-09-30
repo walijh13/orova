@@ -91,7 +91,17 @@ button{font:inherit}.onboarding{position:fixed;inset:0;background:var(--bg);z-in
 <div class="idea"><b>Orova's idea: Soft landing</b><br><span class="muted">Orova leaves short buffers between demanding things instead of filling every minute.</span></div>
 <div class="footer">Orova prototype · Your account and plans are saved on this device.</div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+<script>
+const SUPABASE_URL = "https://izsvdtbqqtzyrdzavvus.supabase.co";
+const SUPABASE_KEY = "sb_publishable_hu6J_PnMHTRhBMxJlQUOjA_N_Ulc4UH";
+
+const supabaseClient = supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+</script>
 <script>
 let tasks=[];
 let showAll=false;
