@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#101411">
+<title>Orova</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--bg:#f4f5f1;--card:#fff;--text:#172019;--muted:#778078;--line:#e3e7e2;--green:#2d6a4f;--soft:#dcece2;--dark:#101411}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input{font:inherit}button{cursor:pointer}.hidden{display:none!important}
+.screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}.auth{width:min(470px,100%);background:#fff;border:1px solid var(--line);border-radius:30px;padding:30px;box-shadow:0 12px 40px #10141112}.logo{font-weight:900;letter-spacing:5px;color:var(--green)}h1{font-size:38px;line-height:1.05;margin:48px 0 12px}.sub,.muted{color:var(--muted);font-size:13px;line-height:1.5}.field{width:100%;border:1px solid var(--line);background:#fafbf9;border-radius:13px;padding:13px;margin-top:9px;outline:0}.primary,.secondary{width:100%;border:0;border-radius:13px;padding:14px;margin-top:10px;font-weight:800}.primary{background:var(--green);color:#fff}.secondary{background:var(--soft);color:var(--green)}.error{color:#b54848;font-size:12px;margin-top:9px}.permission{margin-top:20px;background:#f4f7f3;border-radius:15px;padding:15px}.permission b{display:block;margin-bottom:5px}
+.app{max-width:1050px;margin:auto;padding:18px 14px 40px}.header{display:flex;align-items:center;gap:12px;margin-bottom:16px}.menuBtn{border:0;background:#fff;border-radius:12px;padding:10px 13px}.brand{font-weight:900;letter-spacing:4px;color:var(--green)}.date{font-size:12px;color:var(--muted);margin-top:3px}.progress{margin-left:auto;text-align:right}.progress strong{display:block;font-size:18px}.progress span{font-size:11px;color:var(--muted)}.menu,.card{background:#fff;border:1px solid var(--line);border-radius:22px;box-shadow:0 12px 40px #10141109}.menu{padding:8px;margin-bottom:14px}.menu button{width:100%;border:0;background:transparent;text-align:left;padding:11px;border-radius:9px}.layout{display:grid;grid-template-columns:1.15fr .85fr;gap:15px}.card{padding:19px}.title{font-weight:900;font-size:17px}.next{margin:16px 0;padding:16px;border-radius:17px;background:var(--soft)}.next label{text-transform:uppercase;font-size:10px;font-weight:900;letter-spacing:1px;color:var(--green)}.next h2{margin:6px 0 4px;font-size:21px}.next p{margin:0;color:var(--muted);font-size:12px}.period{margin-top:18px}.periodHead{display:flex;align-items:center;color:var(--muted);font-size:11px;font-weight:900;letter-spacing:1px}.periodHead span{margin-left:auto}.task{display:flex;gap:10px;align-items:flex-start;padding:13px 0;border-bottom:1px solid #edf0ec}.check{width:23px;height:23px;border-radius:50%;border:2px solid #b7c1b9;background:#fff;flex:none}.check.done{background:var(--green);border-color:var(--green);color:#fff}.body{flex:1;min-width:0}.taskName{font-size:14px;font-weight:800}.taskName.done{text-decoration:line-through;color:#9aa39c}.meta{font-size:11px;color:var(--muted);margin-top:4px}.actions{display:flex;gap:4px}.actions button{border:0;background:#f0f3ef;color:var(--green);border-radius:7px;padding:6px 8px;font-size:10px;font-weight:800}.add{display:flex;gap:7px;margin-top:13px}.add input{flex:1;margin:0}.add button{border:0;background:var(--green);color:#fff;border-radius:12px;padding:0 15px;font-weight:800}.ghost{width:100%;border:0;background:#f0f3ef;color:var(--green);border-radius:10px;padding:10px;margin-top:10px;font-weight:800}.chat{height:300px;overflow:auto;background:#f8faf8;border-radius:15px;padding:9px;margin-top:13px}.bubble{max-width:88%;padding:10px 12px;border-radius:14px;margin:7px 0;font-size:13px;line-height:1.45}.bot{background:#e9eee9}.me{background:var(--green);color:#fff;margin-left:auto}.chatrow{display:flex;gap:7px;margin-top:8px}.chatrow input{flex:1;margin:0}.send{width:48px;border:0;background:var(--green);color:#fff;border-radius:12px}.quick{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.quick button{border:0;background:var(--soft);color:var(--green);padding:7px 9px;border-radius:8px;font-size:11px;font-weight:800}.week{margin-top:15px}.weekrow{display:flex;gap:8px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line)}.weekrow b{width:80px;font-size:12px}.weekrow input{flex:1;margin:0}.weekrow button{border:0;background:var(--green);color:#fff;border-radius:8px;padding:8px}.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--dark);color:#fff;padding:11px 15px;border-radius:12px;font-size:12px;z-index:20}
+@media(max-width:760px){.layout{grid-template-columns:1fr}.app{padding:12px}h1{font-size:34px}}
+</style>
+</head>
+<body>
+
+<div id="authScreen" class="screen">
+<div class="auth">
+<div class="logo">OROVA</div>
+<h1>Your day, organized.</h1>
+<p class="sub">Create an account and let Orova turn normal sentences into a clear daily checklist.</p>
+<input id="email" class="field" type="email" placeholder="Email address">
+<input id="password" class="field" type="password" placeholder="Password (6+ characters)">
+<button class="primary" id="create">Create account</button>
+<button class="secondary" id="login">Log in</button>
+<div id="authError" class="error"></div>
+<div class="permission">
+<b>Daily reminders are required</b>
+<span class="sub">Allow notifications so Orova can remind you about your tasks.</span>
+<button class="secondary" id="notify">Allow reminders</button>
+<div id="notifyStatus" class="sub" style="margin-top:7px"></div>
+</div>
+</div>
+</div>
+
+<div id="app" class="app hidden">
+<div class="header">
+<button class="menuBtn" id="menuBtn">☰</button>
+<div><div class="brand">OROVA</div><div id="date" class="date"></div></div>
+<div class="progress"><strong id="percent">0%</strong><span>complete</span></div>
+</div>
+
+<div id="menu" class="menu hidden">
+<button id="weekBtn">📅 Plan another day</button>
+<button id="clearBtn">✓ Clear completed</button>
+<button id="resetBtn">↻ Reset today</button>
+<button id="logout">⇥ Log out</button>
+</div>
+
+<div class="layout">
+<div class="card">
+<div class="title">Today</div>
+<div class="muted">Orova separates your plans into AM and PM automatically.</div>
+<div id="next" class="next"></div>
+<div id="tasks"></div>
+<div class="add">
+<input id="taskInput" class="field" placeholder="e.g. Finish science at 4:30 PM">
+<button id="addBtn">Add</button>
+</div>
+<button class="ghost" id="showBtn">Show full day</button>
+</div>
+
+<div class="card">
+<div class="title">Talk to Orova</div>
+<div class="muted">Write naturally and include times.</div>
+<div id="chat" class="chat"></div>
+<div class="chatrow">
+<input id="chatInput" class="field" placeholder="e.g. dinner moved to 7 PM">
+<button id="send" class="send">↑</button>
+</div>
+<div class="quick">
+<button data-q="What's next?">What's next?</button>
+<button data-q="Plan my day">Plan my day</button>
+</div>
+</div>
+</div>
+<div id="week" class="week hidden"></div>
+</div>
+
+<div id="toast" class="toast hidden"></div>
+
+<script>
+const SUPABASE_URL="https://izsvdtbqqtzyrdzavvus.supabase.co";
+const SUPABASE_KEY="sb_publishable_hu6J_PnMHTRhBMxJlQUOjA_N_Ulc4UH";
+const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+
+let tasks=[],user=null,showAll=false;
+
+const $=id=>document.getElementById(id);
+
+function toast(message){
+ $("toast").textContent=message;
+ $("toast").classList.remove("hidden");
+ setTimeout(()=>$("toast").classList.add("hidden"),2200);
+}
+
+function esc(s){
+ return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
+}
+
+function parseTime(text){
+ text=text.toLowerCase().replace(/\./g,"");
+ const m=text.match(/(\d{1,2})(?::(\d{2}))?\s*(am|pm)?/);
+ if(!m)return null;
+ let h=Number(m[1]),min=Number(m[2]||0),ap=m[3];
+ if(ap==="pm"&&h<12)h+=12;
+ if(ap==="am"&&h===12)h=0;
+ if(!ap&&h<=6)h+=12;
+ if(h>23||min>59)return null;
+ return h*60+min;
+}
+
+function timeText(n){
+ n=(n+1440)%1440;
+ let h=Math.floor(n/60),m=n%60,ap=h>=12?"PM":"AM";
+ h=h%12||12;
+ return h+":"+String(m).padStart(2,"0")+" "+ap;
+}
+
+function duration(title){
+ const t=title.toLowerCase();
+ if(/school|class|lesson|work/.test(t))return 60;
+ if(/homework|study|assignment|science|math/.test(t))return 45;
+ if(/football|soccer|gym|training|practice/.test(t))return 90;
+ if(/dinner|lunch|breakfast|meal/.test(t))return 45;
+ if(/shower|get ready|pack/.test(t))return 20;
+ return 30;
+}
+
+function parseParagraph(text){
+ const re=/\b(?:at|around|by)\s+(\d{1,2})(?::(\d{2}))?\s*(am|pm)?\b/gi;
+ const matches=[...text.matchAll(re)];
+ const result=[];
+ for(let i=0;i<matches.length;i++){
+   const current=matches[i];
+   const previousEnd=i?matches[i-1].index+matches[i-1][0].length:0;
+   let title=text.slice(previousEnd,current.index)
+     .replace(/[,;]+$/,"").trim()
+     .replace(/^(and|then|after that|and then)\s+/i,"")
+     .trim();
+   const time=parseTime(current[1]+":"+(current[2]||"00")+" "+(current[3]||""));
+   if(title&&time!==null){
+     title=title.charAt(0).toUpperCase()+title.slice(1);
+     result.push({
+       id:crypto.randomUUID(),
+       title,
+       start_minute:time,
+       duration_minutes:duration(title),
+       completed:false
+     });
+   }
+ }
+ return result.sort((a,b)=>a.start_minute-b.start_minute);
+}
+
+function render(){
+ $("date").textContent=new Date().toLocaleDateString(undefined,{weekday:"long",month:"short",day:"numeric"});
+ const done=tasks.filter(t=>t.completed).length;
+ $("percent").textContent=(tasks.length?Math.round(done/tasks.length*100):0)+"%";
+
+ const next=tasks.find(t=>!t.completed);
+ $("next").innerHTML=next
+ ?`<label>Up next</label><h2>${esc(next.title)}</h2><p>${timeText(next.start_minute)} · ${next.duration_minutes} min</p>`
+ :`<label>${tasks.length?"All clear":"Ready when you are"}</label><h2>${tasks.length?"You're done for today.":"Tell Orova about your day."}</h2><p>${tasks.length?"Nice work.":"Use one paragraph and include the times."}</p>`;
+
+ const visible=showAll?tasks:tasks.slice(0,6);
+ let html="";
+ for(const period of ["AM","PM"]){
+   const periodTasks=visible.filter(t=>(t.start_minute<720?"AM":"PM")===period);
+   if(!periodTasks.length)continue;
+   html+=`<div class="period"><div class="periodHead">${period}<span>${tasks.filter(t=>(t.start_minute<720?"AM":"PM")===period).length} task(s)</span></div>`;
+   for(const t of periodTasks){
+     html+=`<div class="task">
+       <button class="check ${t.completed?"done":""}" onclick="toggleTask('${t.id}')">${t.completed?"✓":""}</button>
+       <div class="body">
+         <div class="taskName ${t.completed?"done":""}">${esc(t.title)}</div>
+         <div class="meta">${timeText(t.start_minute)} · ${t.duration_minutes} min</div>
+       </div>
+       <div class="actions">
+         <button onclick="editTask('${t.id}')">Edit</button>
+         <button onclick="removeTask('${t.id}')">×</button>
+       </div>
+     </div>`;
+   }
+   html+="</div>";
+ }
+ $("tasks").innerHTML=html||'<div class="muted" style="padding:25px;text-align:center">No tasks yet.</div>';
+ $("showBtn").textContent=showAll?"Show less":"Show full day";
+}
+
+async function loadTasks(){
+ if(!user)return;
+ const date=new Date().toISOString().slice(0,10);
+ const r=await db.from("tasks").select("*").eq("user_id",user.id).eq("task_date",date).order("start_minute");
+ if(r.error){console.error(r.error);toast("Database setup is not finished.");return}
+ tasks=r.data||[];
+ render();
+}
+
+async function saveTasks(items){
+ const rows=items.map(t=>({
+   id:t.id,user_id:user.id,task_date:new Date().toISOString().slice(0,10),
+   title:t.title,start_minute:t.start_minute,duration_minutes:t.duration_minutes,completed:t.completed
+ }));
+ const r=await db.from("tasks").upsert(rows);
+ if(r.error)toast("Could not save the task.");
+}
+
+async function addTasks(items){
+ tasks=[...tasks,...items].sort((a,b)=>a.start_minute-b.start_minute);
+ render();
+ await saveTasks(items);
+}
+
+window.toggleTask=async id=>{
+ const t=tasks.find(x=>x.id===id);
+ if(!t)return;
+ t.completed=!t.completed;
+ render();
+ await db.from("tasks").update({completed:t.completed}).eq("id",id).eq("user_id",user.id);
+};
+
+window.removeTask=async id=>{
+ tasks=tasks.filter(x=>x.id!==id);
+ render();
+ await db.from("tasks").delete().eq("id",id).eq("user_id",user.id);
+};
+
+window.editTask=async id=>{
+ const t=tasks.find(x=>x.id===id);
+ if(!t)return;
+ const title=prompt("Task name:",t.title);
+ if(title===null)return;
+ const time=prompt("Time (example: 4:30 PM):",timeText(t.start_minute));
+ if(time===null)return;
+ const tm=parseTime(time);
+ if(tm===null)return toast("Please enter a valid time.");
+ t.title=title.trim()||t.title;
+ t.start_minute=tm;
+ tasks.sort((a,b)=>a.start_minute-b.start_minute);
+ render();
+ await db.from("tasks").update({title:t.title,start_minute:t.start_minute}).eq("id",id).eq("user_id",user.id);
+};
+
+function addBubble(text,me=false){
+ const d=document.createElement("div");
+ d.className="bubble "+(me?"me":"bot");
+ d.textContent=text;
+ $("chat").appendChild(d);
+ $("chat").scrollTop=$("chat").scrollHeight;
+}
+
+function processText(text){
+ const made=parseParagraph(text);
+ if(!made.length){
+   addBubble("Add a time to your plan, like “go to school at 6:45 AM” or “dinner at 7 PM.”");
+   return;
+ }
+ addTasks(made);
+ addBubble("Done. I separated "+made.length+" task"+(made.length===1?"":"s")+" and sorted them into AM and PM.");
+}
+
+$("send").onclick=()=>{
+ const text=$("chatInput").value.trim();
+ if(!text)return;
+ addBubble(text,true);
+ $("chatInput").value="";
+ if(/what.*next/i.test(text)){
+   const n=tasks.find(t=>!t.completed);
+   addBubble(n?"Your next task is "+n.title+" at "+timeText(n.start_minute)+".":"You're finished.");
+ }else if(/plan my day/i.test(text)){
+   addBubble("Send your whole day in one paragraph with the times. I'll split it into separate checklist tasks.");
+ }else processText(text);
+};
+
+$("chatInput").addEventListener("keydown",e=>{if(e.key==="Enter")$("send").click()});
+
+document.querySelectorAll(".quick button").forEach(b=>b.onclick=()=>{
+ const q=b.dataset.q;
+ addBubble(q,true);
+ if(q==="What's next?"){
+   const n=tasks.find(t=>!t.completed);
+   addBubble(n?"Your next task is "+n.title+" at "+timeText(n.start_minute)+".":"You're finished.");
+ }else addBubble("Send your plans in one paragraph with times and I'll organize them.");
+});
+
+$("addBtn").onclick=()=>{
+ const text=$("taskInput").value.trim();
+ if(!text)return;
+ const made=parseParagraph(text);
+ if(!made.length)return toast("Include a time, like 5 PM.");
+ $("taskInput").value="";
+ addTasks(made);
+};
+
+$("taskInput").addEventListener("keydown",e=>{if(e.key==="Enter")$("addBtn").click()});
+$("showBtn").onclick=()=>{showAll=!showAll;render()};
+$("menuBtn").onclick=()=>$("menu").classList.toggle("hidden");
+
+$("clearBtn").onclick=async()=>{
+ const ids=tasks.filter(t=>t.completed).map(t=>t.id);
+ tasks=tasks.filter(t=>!t.completed);
+ render();
+ if(ids.length)await db.from("tasks").delete().in("id",ids).eq("user_id",user.id);
+};
+
+$("resetBtn").onclick=async()=>{
+ if(!confirm("Delete today's tasks?"))return;
+ const ids=tasks.map(t=>t.id);
+ tasks=[];
+ render();
+ if(ids.length)await db.from("tasks").delete().in("id",ids).eq("user_id",user.id);
+};
+
+$("logout").onclick=async()=>{
+ await db.auth.signOut();
+ location.reload();
+};
+
+$("weekBtn").onclick=()=>{
+ $("menu").classList.add("hidden");
+ $("week").classList.remove("hidden");
+ $("week").innerHTML='<div class="card"><div class="title">Plan another day</div><div class="muted">Write a day normally and Orova will separate it into timed tasks.</div>'+
+ ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"].map(d=>
+ `<div class="weekrow"><b>${d}</b><input class="field" placeholder="school at 8 AM, study at 5 PM"><button onclick="toast('Saved for planning.')">Save</button></div>`).join("")+
+ '</div>';
+};
+
+$("notify").onclick=async()=>{
+ if(!("Notification" in window)){
+   $("notifyStatus").textContent="Notifications aren't supported here.";
+   return;
+ }
+ const p=await Notification.requestPermission();
+ $("notifyStatus").textContent=p==="granted"?"✓ Reminders enabled.":"Notifications are blocked. Allow them in browser settings.";
+};
+
+async function startApp(){
+ const r=await db.auth.getUser();
+ if(!r.data.user)return;
+ user=r.data.user;
+
+ if(Notification.permission!=="granted"){
+   $("authScreen").classList.remove("hidden");
+   return;
+ }
+
+ $("authScreen").classList.add("hidden");
+ $("app").classList.remove("hidden");
+ await loadTasks();
+
+ if(!$("chat").children.length)
+   addBubble("Tell me your plans with times and I'll organize them into separate AM and PM checklist tasks.");
+}
+
+$("create").onclick=async()=>{
+ const email=$("email").value.trim();
+ const password=$("password").value;
+ $("authError").textContent="";
+ if(!email||password.length<6){
+   $("authError").textContent="Enter a valid email and a 6+ character password.";
+   return;
+ }
+ const r=await db.auth.signUp({email,password});
+ if(r.error){
+   $("authError").textContent=r.error.message;
+   return;
+ }
+ if(!r.data.session){
+   $("authError").textContent="Check your email to confirm your account, then log in.";
+   return;
+ }
+ await startApp();
+};
+
+$("login").onclick=async()=>{
+ const r=await db.auth.signInWithPassword({
+   email:$("email").value.trim(),
+   password:$("password").value
+ });
+ if(r.error){
+   $("authError").textContent=r.error.message;
+   return;
+ }
+ await startApp();
+};
+
+db.auth.getSession().then(async r=>{
+ if(r.data.session)await startApp();
+ else $("authScreen").classList.remove("hidden");
+});
+</script>
+</body>
+</html>
